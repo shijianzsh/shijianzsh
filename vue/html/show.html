@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vue组件</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+</head>
+<body>
+<div id="app-1">
+    <div :style="{fontSize:postFontSize + 'em'}">
+        <blog-post
+                v-for="post in posts"
+                v-bind:key="post.id"
+                v-bind:post="post"
+                v-on:enlarge-text="postFontSize += $event"></blog-post>
+                        ||
+                <!--
+                v-on:enlarge-text="postFontSize += 0.1" 使用此方法时$emit中的0.1 要去掉
+                $emit 事件抛出一个值  父级监听的时候使用 $event 访问被抛出的值
+                或者可以使用 methods
+                -->
+    </div>
+</div>
+
+<div id="app-2">
+    <alert-box>
+        Something bad happened.
+    </alert-box>
+</div>
+
+</body>
+
+<div class="app-3">
+    <nav></nav>
+</div>
+<script>
+    Vue.component('blog-post', {
+        props:['post'],
+        template:'<div class="blog-post">'
+                + '<span>{{ post.title }}</span>'
+                + '&nbsp;<button v-on:click="$emit(\'enlarge-text\',0.1)">Enlarge text</button>'
+                + '<div v-html="post.content"></div>'
+                + '</div>'
+    })
+    new Vue({
+        el:'#app-1',
+        data:{
+            posts:[
+                {id:1,title:'My first',content:'哈哈'},
+                {id:2,title:'My second',content:'呵呵'}
+            ],
+            postFontSize:1
+        }
+    })
+
+    Vue.component('alert-box', {
+        template: `
+            <div class="demo-alert-box">
+              <strong>Error!</strong>
+              <slot></slot>
+            </div>
+          `
+    })
+    new Vue({
+        el:'#app-2'
+    })
+
+    Vue.component('nav', {
+        template:`
+                <a v-bind:href="url"
+                   class="nav-link">
+                   <solt></solt>
+                </a>`
+    })
+    new Vue({
+        el:'#app-3',
+
+    })
+</script>
+</html>

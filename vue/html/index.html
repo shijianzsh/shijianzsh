@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vue</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+    <style>
+        .done{
+            text-decoration: line-through;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <span v-bind:title="message">
+        {{ info }}
+    </span>
+</div>
+
+<div id="app-1">
+    <ol>
+        <li v-for="vo in arr">
+            {{ vo }}
+        </li>
+    </ol>
+</div>
+
+<div id="app-2">
+    <p>{{ message }}</p>
+    <button v-on:click="reverseMessage">逆转消息</button>
+</div>
+
+<div id="app-3">
+    <p>{{ message }}</p>
+    <input v-model="message">
+</div>
+
+<div id="app-4">
+    <ol>
+        <todo-item
+        v-for="item in groceryList"
+        :todo="item"
+        :key="item.id"></todo-item>
+    </ol>
+</div>
+
+<div id="app-5">
+    <p>{{ foo }}</p>
+    <button v-on:click="foo = 'baz'">Change it</button>
+</div>
+
+<div id="app-6">
+    <template v-if="loginType === 'username'">
+        <label>Username</label>
+        <input type="text" placeholder="Enter your username" key="username_input">
+    </template>
+    <template v-else>
+        <label>Email</label>
+        <input type="text" placeholder="Enter your email" key="email_input">
+    </template>
+    <button @click="reset">Toggle</button>
+</div>
+
+<div id="app-7">
+    <p v-for="item in list">{{ item }}</p>
+</div>
+
+<div id="app-8">
+    <!--<li v-for="n in evenNumber">{{ n }}</li>-->
+    <li v-for="n in even(numbers)">{{ n }}</li>
+</div>
+
+<div id="app-9">
+    <input v-model="newTodoText" v-on:keyup.enter="addNewTodo" placeholder="Add a todo">
+    <ul>
+        <li is="todo-list"
+            v-for="(todo, index) in todos"
+            v-bind:key="todo.id"
+            v-bind:title="todo.title"
+            v-on:remove="todos.splice(index,1)"></li>
+    </ul>
+</div>
+
+<div id="app-10">
+    <button v-on:click="counter += 1">Add</button>
+    <p>The button above has been clicked {{ counter }} times.</p>
+</div>
+
+<div id="app-11">
+    <input type="number" v-model="first">
+    <select name="" id="" v-model="operation">
+        <option value="0">+</option>
+        <option value="1">-</option>
+        <option value="2">*</option>
+        <option value="3">/</option>
+    </select>
+    <input type="number" v-model="last">
+    <button @click="calculate">=</button>
+    <strong>{{ result }}</strong>
+</div>
+
+<div id="app-12">
+    <h1>Todo</h1>
+    <p>{{ interest.filter(int => !int.done).length }} of {{ interest.length }} remaning [archive]</p>
+    <p v-for="(int, index) in interest">
+        <!--
+            checkbox 双向绑定 int.done
+        -->
+        <input type="checkbox" v-model="int.done">
+        <!--
+            v-bind: 可以用来动态绑定属性值
+            class 给一个对象：
+            对象的 key 就是类名
+            对象的 value 就是布尔型
+
+            当布尔型为 true 的时候，作用这个 key 的样式
+            当布尔型为 false 的时候，去除这个 key 的样式
+        -->
+        <span v-bind:class="{done: int.done}">{{ int.title }}</span>
+        <button @click="removeInterestClick(index)">X</button>
+    </p>
+    <input type="text" v-model="interestText" @keydown.enter="addInterestClick">
+    <button @click="addInterestClick">Add</button>
+</div>
+
+<div id="app-13">
+    <div v-for="tmp in tmpList">
+        <!--
+            v-bind 只能用于属性的 它的值是一个 JavaScript 表达式，和 {{}} 里面的语法一致
+            唯一的区别是 {{}} 用于标签文本绑定，v-bind 用于标签属性绑定
+        -->
+        <a v-bind:href="tmp.id">{{ tmp.title }}</a>
+    </div>
+</div>
+</body>
+<script>
+
+    new Vue({
+        el:'#app',
+        data:{
+            info:'加载的内容信息',
+            message:'页面加载于' + new Date().toLocaleString()
+        },
+
+    }),
+
+    new Vue({
+        el:'#app-1',
+        data:{
+            arr:[
+                '学习 JavaScript',
+                '学习 Vue',
+                '学习 创建一个项目'
+            ]
+        }
+    })
+
+    new Vue({
+        el:'#app-2',
+        data:{
+            message:'Hello Vue'
+        },
+        methods:{
+            reverseMessage:function () {
+                this.message=this.message.split('').reverse().join('')
+            }
+        }
+    })
+
+    new Vue({
+        el:'#app-3',
+        data:{
+            message:'Hello Vue!'
+        }
+    })
+
+    Vue.component('todo-item', {
+        props:['todo'],
+        template: '<li>{{ todo.text }}</li>',
+    })
+    new Vue({
+        el:'#app-4',
+        data:{
+            groceryList:[
+                {id:0,text:'蔬菜'},
+                {id:1,text:'奶酪'},
+                {id:2,text:'随便了'}
+            ]
+        }
+    })
+
+    var obj = {
+        foo:'bar'
+    }
+    Object.freeze(obj);  // Object.freeze() 阻止修改现有属性
+    new Vue({
+        el:'#app-5',
+        data:obj
+    })
+    new Vue({
+        data:{
+            a:1
+        },
+        created:function () {
+            console.log('a is =' + this.a)
+        }
+    })
+
+    new Vue({
+        el:'#app-6',
+        data:{
+          loginType:'username'
+        },
+        methods:{
+            reset:function () {
+                this.loginType = this.loginType == 'username' ? 'email' : 'username';
+            }
+        }
+    })
+
+    var vm = new Vue({
+        el:'#app-7',
+        data:{
+            list:[
+                'a',
+                'b',
+                'c'
+            ]
+        }
+    })
+    Vue.set(vm.list, 2, 'g') // 当你利用索引直接设置一个项
+    vm.list.splice(0, 1, 'd')
+
+    new Vue({
+        el:'#app-8',
+        data:{
+            numbers:[1,2,3,4,5,6]
+        },
+        /*computed:{
+            evenNumber:function () {
+                return this.numbers.filter(function (number) {
+                    return number % 2 === 0
+                })
+            }
+        }*/
+        methods:{
+            even:function (numbers) {
+                return numbers.filter(function (number) {
+                    return number % 2 === 0
+                })
+            }
+        }
+    })
+
+    Vue.component('todo-list', {
+        template:'<li>{{ title }}<button v-on:click="$emit(\'remove\')">X</button></li>',
+        props:['title']
+    })
+    new Vue({
+        el:'#app-9',
+        data:{
+            newTodoText:'',
+            todos:[
+                {id:1,title:'默认的数据1'},
+                {id:2,title:'默认的数据2'},
+                {id:3,title:'默认的数据3'}
+            ],
+            nextTodoId:4
+        },
+        methods:{
+            addNewTodo:function () {
+                this.todos.push({
+                    id:this.nextTodoId++,
+                    title:this.newTodoText
+                })
+                this.newTodoText = ''
+            }
+        }
+    })
+
+    new Vue({
+        el:'#app-10',
+        data:{
+            counter:0
+        }
+    })
+
+    new Vue({
+        el: '#app-11',
+        data: {
+            first: 2,
+            last: 3,
+            operation: '2',
+            result: 6
+        },
+        methods: {
+            calculate () {
+                switch (this.operation) {
+                    case '0':
+                        this.result = this.first + this.last;
+                        break;
+                    case '1':
+                        this.result = this.first - this.last;
+                        break;
+                    case '2':
+                        this.result = this.first * this.last;
+                        break;
+                    case '3':
+                        this.result = this.first / this.last;
+                        break;
+                }
+            }
+        },
+
+    })
+
+    const interest = [
+        {id: 1, title: '吃饭', done: false},
+        {id: 2, title: '睡觉', done: true},
+        {id: 3, title: '打豆豆', done: false},
+    ]
+    new Vue({
+        el: '#app-12',
+        data:{
+            interest,
+            interestText: ''
+        },
+        methods: {
+            addInterestClick () {
+                const interestText = this.interestText.trim()
+
+                // 判空
+                if (!interestText.length) {
+                    return
+                }
+
+                const arr = this.interest
+
+                this.interest.push({
+                    id: arr[interest.length - 1].id + 1,
+                    title: interestText,
+                    done: false
+                })
+
+                // 添加 interest 完成，清空文本框
+                this.interestText = ''
+            },
+
+            removeInterestClick (index) {
+                this.interest.splice(index, 1)
+            }
+        }
+    })
+
+    const tmpList = [
+        {id: 1, title: '哈哈'},
+        {id: 2, title: '呵呵'},
+        {id: 3, title: '吼吼'}
+    ]
+    new Vue({
+        el: '#app-13',
+        data: {}
+    })
+</script>
+</html>
